@@ -1,10 +1,6 @@
 name: lint
-
 on:
-  push:
-    branches: [ main ]
-  pull_request:
-
+  push: null
 jobs:
   resolve-modules:
     name: Resolve Modules
@@ -12,24 +8,22 @@ jobs:
     outputs:
       matrix: ${{ steps.set-matrix.outputs.matrix }}
     steps:
-      - name: Checkout Sources
-        uses: actions/checkout@v4
-      - id: set-matrix
-        run: ./.github/workflows/resolve-modules.sh
+    - name: Checkout Sources
+      uses: actions/checkout@v4
+    - id: set-matrix
+      run: ./.github/workflows/resolve-modules.sh
   golangci-lint:
     needs: resolve-modules
     runs-on: ubuntu-latest
     strategy:
       matrix: ${{ fromJson(needs.resolve-modules.outputs.matrix) }}
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: 'go.mod'
-
-      - name: golangci-lint
-        uses: golangci/golangci-lint-action@v8
-        with:
-          version: v2.1.6
-          working-directory: ${{ matrix.workdir }}
-
+    - uses: actions/checkout@v4
+    - uses: actions/setup-go@v5
+      with:
+        go-version-file: go.mod
+    - name: golangci-lint
+      uses: golangci/golangci-lint-action@v6
+      with:
+        version: v1.52.2
+        working-directory: ${{ matrix.workdir }}
